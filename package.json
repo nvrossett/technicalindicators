@@ -96,7 +96,6 @@
   "homepage": "https://github.com/NotAlfred/technicalindicators#readme",
   "devDependencies": {
     "@types/node": "^6.0.31",
-    "draw-candlestick": "2.0.3",
     "ts-node": "^1.0.0",
     "tslint": "^4.0.0",
     "typescript": "^2.9.2"
