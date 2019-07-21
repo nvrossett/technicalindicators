@@ -1,11 +1,11 @@
 {
-  "name": "technicalindicators",
-  "version": "2.0.8",
+  "name": "lessertechnicalindicators",
+  "version": "0.0.1",
   "description": "Techincal Indicators written in javascript",
-  "main": "dist/index.js",
+  "main": "lib/index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/anandanand84/technicalindicators.git"
+    "url": "git+https://github.com/NotAlfred/technicalindicators.git"
   },
   "keywords": [
     "Technical indicators",
@@ -91,9 +91,9 @@
   "author": "anand.anand84@gmail.com",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/anandanand84/technicalindicators/issues"
+    "url": "https://github.com/NotAlfred/technicalindicators/issues"
   },
-  "homepage": "https://github.com/anandanand84/technicalindicators#readme",
+  "homepage": "https://github.com/NotAlfred/technicalindicators#readme",
   "devDependencies": {
     "@types/node": "^6.0.31",
     "draw-candlestick": "2.0.3",
