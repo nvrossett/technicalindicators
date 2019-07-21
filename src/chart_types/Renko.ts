@@ -1,38 +1,40 @@
-import { CandleData, CandleList } from '../StockData';
-import { atr } from '../directionalmovement/ATR';
+import { atr } from "../directionalmovement/ATR";
+import { CandleData, CandleList } from "../StockData";
 
 /**
  * Created by AAravindan on 5/4/16.
  */
-import { Indicator, IndicatorInput } from '../indicator/indicator';
+import { Indicator, IndicatorInput } from "../indicator/indicator";
 
 export class RenkoInput extends IndicatorInput {
-    period? :number;
-    brickSize? : number
-    useATR?: boolean
-    low? : number[]
-    open? : number[]
-    volume? : number[]
-    high? : number[]
-    close? : number[]
-    timestamp? : number[]
+    public period?: number;
+    public brickSize?: number;
+    public useATR?: boolean;
+    public low?: number[];
+    public open?: number[];
+    public volume?: number[];
+    public high?: number[];
+    public close?: number[];
+    public timestamp?: number[];
 }
 
-class Renko extends Indicator{
-    result : CandleList;
-    generator:IterableIterator<CandleData | undefined>;
-    constructor(input:RenkoInput) {
+class Renko extends Indicator {
+
+    public static calculate = renko;
+    public result: CandleList;
+    public generator: IterableIterator<CandleData | undefined>;
+    constructor(input: RenkoInput) {
       super(input);
-      var format = this.format;
-      let useATR = input.useATR;
+      const format = this.format;
+      const useATR = input.useATR;
       let brickSize = input.brickSize || 0;
-      if(useATR) {
-       let atrResult = atr((<any>Object).assign({}, input));
+      if (useATR) {
+       const atrResult = atr((Object as any).assign({}, input));
        brickSize = atrResult[atrResult.length - 1];
       }
-      this.result = new CandleList();;
-      if(brickSize === 0) {
-          console.error('Not enough data to calculate brickSize for renko when using ATR');
+      this.result = new CandleList();
+      if (brickSize === 0) {
+          console.error("Not enough data to calculate brickSize for renko when using ATR");
           return;
       }
       let lastOpen = 0;
@@ -41,11 +43,11 @@ class Renko extends Indicator{
       let lastClose = 0;
       let lastVolume = 0;
       let lastTimestamp = 0;
-      this.generator = (function* (){
+      this.generator = (function*() {
           let candleData = yield;
           while (true) {
-            //Calculating first bar
-            if(lastOpen === 0) {
+            // Calculating first bar
+            if (lastOpen === 0) {
                 lastOpen = candleData.close;
                 lastHigh = candleData.high;
                 lastLow = candleData.low;
@@ -55,25 +57,25 @@ class Renko extends Indicator{
                 candleData = yield;
                 continue;
             }
-            let absoluteMovementFromClose = Math.abs(candleData.close - lastClose);
-            let absoluteMovementFromOpen = Math.abs(candleData.close - lastOpen);
+            const absoluteMovementFromClose = Math.abs(candleData.close - lastClose);
+            const absoluteMovementFromOpen = Math.abs(candleData.close - lastOpen);
 
-            if((absoluteMovementFromClose >= brickSize) && (absoluteMovementFromOpen >= brickSize)) {
-                let reference = absoluteMovementFromClose > absoluteMovementFromOpen ? lastOpen : lastClose
-                let calculated = <any>{
+            if ((absoluteMovementFromClose >= brickSize) && (absoluteMovementFromOpen >= brickSize)) {
+                const reference = absoluteMovementFromClose > absoluteMovementFromOpen ? lastOpen : lastClose;
+                const calculated = {
                     open : reference,
                     high : lastHigh > candleData.high ? lastHigh : candleData.high,
                     low : lastLow < candleData.Low ? lastLow : candleData.low,
                     close : reference > candleData.close ? (reference - brickSize) : (reference + brickSize),
                     volume : lastVolume + candleData.volume,
-                    timestamp : candleData.timestamp
-                };
+                    timestamp : candleData.timestamp,
+                } as any;
                 lastOpen = calculated.open;
                 lastHigh = calculated.close;
                 lastLow = calculated.close;
                 lastClose = calculated.close;
                 lastVolume = 0;
-                candleData = yield calculated
+                candleData = yield calculated;
             } else {
                 lastHigh = lastHigh > candleData.high ? lastHigh : candleData.high;
                 lastLow = lastLow < candleData.Low ? lastLow : candleData.low;
@@ -86,37 +88,35 @@ class Renko extends Indicator{
 
       this.generator.next();
       input.low.forEach((tick, index) => {
-            var result = this.generator.next({ 
+            const result = this.generator.next({
                 open : input.open[index],
                 high : input.high[index],
                 low : input.low[index],
                 close : input.close[index],
                 volume : input.volume[index],
-                timestamp : input.timestamp[index]
+                timestamp : input.timestamp[index],
             });
-            if(result.value){
-                this.result.open.push(result.value.open)
-                this.result.high.push(result.value.high)
-                this.result.low.push(result.value.low)
-                this.result.close.push(result.value.close)
-                this.result.volume.push(result.value.volume)
-                this.result.timestamp.push(result.value.timestamp)
+            if (result.value) {
+                this.result.open.push(result.value.open);
+                this.result.high.push(result.value.high);
+                this.result.low.push(result.value.low);
+                this.result.close.push(result.value.close);
+                this.result.volume.push(result.value.volume);
+                this.result.timestamp.push(result.value.timestamp);
             }
       });
     }
 
-    static calculate=renko;
-
-    nextValue(price:number):CandleList | undefined {
-        console.error('Cannot calculate next value on Renko, Every value has to be recomputed for every change, use calcualte method');
+    public nextValue(price: number): CandleList | undefined {
+        console.error("Cannot calculate next value on Renko, Every value has to be recomputed for every change, use calcualte method");
         return null;
-    };
+    }
 }
 
-export function renko(input:RenkoInput):CandleList {
+export function renko(input: RenkoInput): CandleList {
        Indicator.reverseInputs(input);
-        var result = new Renko(input).result;
-        if(input.reversedInput) {
+       const result = new Renko(input).result;
+       if (input.reversedInput) {
             result.open.reverse();
             result.high.reverse();
             result.low.reverse();
@@ -124,6 +124,6 @@ export function renko(input:RenkoInput):CandleList {
             result.volume.reverse();
             result.timestamp.reverse();
         }
-        Indicator.reverseInputs(input);
-        return result;
-    };
+       Indicator.reverseInputs(input);
+       return result;
+    }

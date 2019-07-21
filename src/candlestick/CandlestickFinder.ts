@@ -1,33 +1,33 @@
-import StockData from '../StockData';
+import StockData from "../StockData";
 export default class CandlestickFinder {
-    requiredCount:number
-    name:string
+    public requiredCount: number;
+    public name: string;
     constructor() {
         // if (new.target === Abstract) {
         //     throw new TypeError("Abstract class");
         // }
     }
-    approximateEqual(a:number, b:number):boolean {
-        let left = parseFloat(Math.abs(a - b).toPrecision(4)) * 1;
-        let right = parseFloat((a * 0.001).toPrecision(4)) * 1; 
-        return  left <= right 
+    public approximateEqual(a: number, b: number): boolean {
+        const left = parseFloat(Math.abs(a - b).toPrecision(4)) * 1;
+        const right = parseFloat((a * 0.001).toPrecision(4)) * 1;
+        return  left <= right;
     }
-    
-    logic(data:StockData):boolean {
-        throw "this has to be implemented";        
+
+    public logic(data: StockData): boolean {
+        throw new Error("this has to be implemented");
     }
-    getAllPatternIndex (data:StockData) {
-        if(data.close.length < this.requiredCount) {
-            console.warn('Data count less than data required for the strategy ', this.name);
+    public getAllPatternIndex(data: StockData) {
+        if (data.close.length < this.requiredCount) {
+            console.warn("Data count less than data required for the strategy ", this.name);
             return [];
         }
-        if(data.reversedInput) {
+        if (data.reversedInput) {
             data.open.reverse();
             data.high.reverse();
             data.low.reverse();
             data.close.reverse();
         }
-        let strategyFn = this.logic;
+        const strategyFn = this.logic;
         return this._generateDataForCandleStick(data)
                 .map((current, index) => {
                             return strategyFn.call(this, current) ? index : undefined;
@@ -36,34 +36,34 @@ export default class CandlestickFinder {
                         });
     }
 
-    hasPattern (data:StockData) {
-        if(data.close.length < this.requiredCount) {
-            console.warn('Data count less than data required for the strategy ', this.name);
+    public hasPattern(data: StockData) {
+        if (data.close.length < this.requiredCount) {
+            console.warn("Data count less than data required for the strategy ", this.name);
             return false;
         }
-        if(data.reversedInput) {
+        if (data.reversedInput) {
             data.open.reverse();
             data.high.reverse();
             data.low.reverse();
             data.close.reverse();
         }
-        let strategyFn = this.logic;
+        const strategyFn = this.logic;
         return strategyFn.call(this, this._getLastDataForCandleStick(data));
     }
 
-    protected _getLastDataForCandleStick(data:StockData) {
-        let requiredCount = this.requiredCount;
+    protected _getLastDataForCandleStick(data: StockData) {
+        const requiredCount = this.requiredCount;
         if (data.close.length === requiredCount) {
             return data;
         } else {
-            let returnVal = {
+            const returnVal = {
                 open : [],
                 high : [],
                 low  : [],
-                close: []
+                close: [],
             } as StockData;
             let i = 0;
-            let index = data.close.length - requiredCount;
+            const index = data.close.length - requiredCount;
             while (i < requiredCount) {
                 returnVal.open.push(data.open[index + i]);
                 returnVal.high.push(data.high[index + i]);
@@ -75,17 +75,17 @@ export default class CandlestickFinder {
         }
     }
 
-    protected _generateDataForCandleStick(data:StockData) {
-            let requiredCount = this.requiredCount;
-            let generatedData = data.close.map(function(currentData, index) {
+    protected _generateDataForCandleStick(data: StockData) {
+            const requiredCount = this.requiredCount;
+            const generatedData = data.close.map(function(currentData, index) {
                 let i = 0;
-                let returnVal = {
+                const returnVal = {
                     open : [],
                     high : [],
                     low  : [],
-                    close: []
+                    close: [],
                 } as StockData;
-                while(i < requiredCount) {
+                while (i < requiredCount) {
                     returnVal.open.push(data.open[index + i]);
                     returnVal.high.push(data.high[index + i]);
                     returnVal.low.push(data.low[index + i]);
@@ -93,7 +93,7 @@ export default class CandlestickFinder {
                     i++;
                 }
                 return returnVal;
-            }).filter((val, index) => { return (index <= (data.close.length - requiredCount))  });
+            }).filter((val, index) => (index <= (data.close.length - requiredCount)));
             return generatedData;
     }
 }

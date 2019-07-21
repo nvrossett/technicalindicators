@@ -1,31 +1,31 @@
-import StockData from '../StockData';
-import CandlestickFinder from './CandlestickFinder';
+import StockData from "../StockData";
+import CandlestickFinder from "./CandlestickFinder";
 
 export default class BearishEngulfingPattern extends CandlestickFinder {
     constructor() {
         super();
-        this.name = 'BearishEngulfingPattern';
+        this.name = "BearishEngulfingPattern";
         this.requiredCount  = 2;
     }
-    logic (data:StockData) {
-        let firstdaysOpen   = data.open[0];
-        let firstdaysClose  = data.close[0];
-        let firstdaysHigh   = data.high[0];
-        let firstdaysLow    = data.low[0]
-        let seconddaysOpen  = data.open[1];
-        let seconddaysClose = data.close[1];
-        let seconddaysHigh  = data.high[1];
-        let seconddaysLow   = data.low[1]
-        
-        let isBearishEngulfing     = ((firstdaysClose > firstdaysOpen) && 
+    public logic(data: StockData) {
+        const firstdaysOpen   = data.open[0];
+        const firstdaysClose  = data.close[0];
+        const firstdaysHigh   = data.high[0];
+        const firstdaysLow    = data.low[0];
+        const seconddaysOpen  = data.open[1];
+        const seconddaysClose = data.close[1];
+        const seconddaysHigh  = data.high[1];
+        const seconddaysLow   = data.low[1];
+
+        const isBearishEngulfing     = ((firstdaysClose > firstdaysOpen) &&
                                         (firstdaysOpen < seconddaysOpen) &&
-                                        (firstdaysClose < seconddaysOpen)&&
+                                        (firstdaysClose < seconddaysOpen) &&
                                         (firstdaysOpen > seconddaysClose));
-                    
+
         return (isBearishEngulfing);
    }
 }
 
-export function bearishengulfingpattern(data:StockData) {
+export function bearishengulfingpattern(data: StockData) {
     return new BearishEngulfingPattern().hasPattern(data);
 }

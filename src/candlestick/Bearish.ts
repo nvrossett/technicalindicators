@@ -1,21 +1,21 @@
-import BearishEngulfingPattern from './BearishEngulfingPattern';
-import BearishHarami from './BearishHarami';
-import BearishHaramiCross from './BearishHaramiCross';
-import EveningDojiStar from './EveningDojiStar';
-import EveningStar from './EveningStar';
-import BearishMarubozu from './BearishMarubozu';
-import ThreeBlackCrows from './ThreeBlackCrows';
-import BearishHammerStick from './BearishHammerStick';
-import BearishInvertedHammerStick from './BearishInvertedHammerStick';
-import HangingMan from './HangingMan';
-import HangingManUnconfirmed from './HangingManUnconfirmed';
-import ShootingStar from './ShootingStar';
-import ShootingStarUnconfirmed from './ShootingStarUnconfirmed';
-import TweezerTop from './TweezerTop';
-import StockData from '../StockData';
-import CandlestickFinder from './CandlestickFinder';
+import StockData from "../StockData";
+import BearishEngulfingPattern from "./BearishEngulfingPattern";
+import BearishHammerStick from "./BearishHammerStick";
+import BearishHarami from "./BearishHarami";
+import BearishHaramiCross from "./BearishHaramiCross";
+import BearishInvertedHammerStick from "./BearishInvertedHammerStick";
+import BearishMarubozu from "./BearishMarubozu";
+import CandlestickFinder from "./CandlestickFinder";
+import EveningDojiStar from "./EveningDojiStar";
+import EveningStar from "./EveningStar";
+import HangingMan from "./HangingMan";
+import HangingManUnconfirmed from "./HangingManUnconfirmed";
+import ShootingStar from "./ShootingStar";
+import ShootingStarUnconfirmed from "./ShootingStarUnconfirmed";
+import ThreeBlackCrows from "./ThreeBlackCrows";
+import TweezerTop from "./TweezerTop";
 
-let bearishPatterns = [
+const bearishPatterns = [
     new BearishEngulfingPattern(),
     new BearishHarami(),
     new BearishHaramiCross(),
@@ -29,22 +29,22 @@ let bearishPatterns = [
     new HangingManUnconfirmed(),
     new ShootingStar(),
     new ShootingStarUnconfirmed(),
-    new TweezerTop()
+    new TweezerTop(),
 ];
 
 export default class BearishPatterns extends CandlestickFinder {
     constructor() {
         super();
-        this.name = 'Bearish Candlesticks';
+        this.name = "Bearish Candlesticks";
     }
 
-    hasPattern (data:StockData) {
+    public hasPattern(data: StockData) {
         return bearishPatterns.reduce(function(state, pattern) {
             return state || pattern.hasPattern(data);
-        }, false)
+        }, false);
     }
 }
 
-export function bearish(data:StockData){
+export function bearish(data: StockData) {
     return new BearishPatterns().hasPattern(data);
 }

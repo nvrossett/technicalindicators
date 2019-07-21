@@ -1,64 +1,66 @@
 /**
  * Created by AAravindan on 5/4/16.
  */
-import { Indicator, IndicatorInput } from '../indicator/indicator';
-import { SMA } from './SMA';
-import { EMA } from './EMA';
+import { Indicator, IndicatorInput } from "../indicator/indicator";
+import { EMA } from "./EMA";
+import { SMA } from "./SMA";
 
 export class MACDInput extends IndicatorInput {
-    SimpleMAOscillator:boolean = true;
-    SimpleMASignal:boolean = true;
-    fastPeriod:number;
-    slowPeriod:number;
-    signalPeriod:number;
-    constructor(public values:number[]) {
+    public SimpleMAOscillator: boolean = true;
+    public SimpleMASignal: boolean = true;
+    public fastPeriod: number;
+    public slowPeriod: number;
+    public signalPeriod: number;
+    constructor(public values: number[]) {
         super();
     }
 }
 
 export class MACDOutput {
-    MACD?:number
-    signal?:number
-    histogram?:number
+    public MACD?: number;
+    public signal?: number;
+    public histogram?: number;
 }
 
-export class MACD extends Indicator{
-    result : MACDOutput[];
-    generator:IterableIterator<MACDOutput | undefined>;
-    constructor(input:MACDInput) {
+export class MACD extends Indicator {
+
+    public static calculate = macd;
+    public result: MACDOutput[];
+    public generator: IterableIterator<MACDOutput | undefined>;
+    constructor(input: MACDInput) {
       super(input);
-      var oscillatorMAtype = input.SimpleMAOscillator ? SMA : EMA;
-      var signalMAtype   = input.SimpleMASignal ? SMA : EMA;
-      var fastMAProducer = new oscillatorMAtype({period : input.fastPeriod, values : [], format : (v) => {return v}});
-      var slowMAProducer = new oscillatorMAtype({period : input.slowPeriod, values : [], format : (v) => {return v}});
-      var signalMAProducer = new signalMAtype({period : input.signalPeriod, values : [], format : (v) => {return v}});
-      var format = this.format;
+      const oscillatorMAtype = input.SimpleMAOscillator ? SMA : EMA;
+      const signalMAtype   = input.SimpleMASignal ? SMA : EMA;
+      const fastMAProducer = new oscillatorMAtype({period : input.fastPeriod, values : [], format : (v) => v});
+      const slowMAProducer = new oscillatorMAtype({period : input.slowPeriod, values : [], format : (v) => v});
+      const signalMAProducer = new signalMAtype({period : input.signalPeriod, values : [], format : (v) => v});
+      const format = this.format;
       this.result = [];
 
-      this.generator = (function* (){
-        var index = 0;
-        var tick;
-        var MACD:number|undefined, signal:number|undefined, histogram:number|undefined, fast:number|undefined, slow:number|undefined;
+      this.generator = (function*() {
+        let index = 0;
+        let tick;
+        let MACD: number | undefined, signal: number | undefined, histogram: number | undefined, fast: number | undefined, slow: number | undefined;
         while (true) {
-          if(index < input.slowPeriod){
+          if (index < input.slowPeriod) {
             tick = yield;
             fast = fastMAProducer.nextValue(tick);
             slow = slowMAProducer.nextValue(tick);
             index++;
             continue;
           }
-          if(fast && slow) { //Just for typescript to be happy
+          if (fast && slow) { // Just for typescript to be happy
             MACD = fast - slow;
             signal = signalMAProducer.nextValue(MACD);
-          } 
+          }
           histogram = MACD - signal;
           tick = yield({
-            //fast : fast,
-            //slow : slow,
+            // fast : fast,
+            // slow : slow,
             MACD : format(MACD),
             signal : signal ? format(signal) : undefined,
-            histogram : isNaN(histogram) ? undefined : format(histogram)
-          })
+            histogram : isNaN(histogram) ? undefined : format(histogram),
+          });
           fast = fastMAProducer.nextValue(tick);
           slow = slowMAProducer.nextValue(tick);
         }
@@ -67,27 +69,25 @@ export class MACD extends Indicator{
       this.generator.next();
 
       input.values.forEach((tick) => {
-        var result = this.generator.next(tick);
-        if(result.value != undefined){
+        const result = this.generator.next(tick);
+        if (result.value !== undefined) {
           this.result.push(result.value);
         }
       });
     }
 
-    static calculate=macd;
-
-    nextValue(price:number):MACDOutput | undefined {
-        var result = this.generator.next(price).value;
+    public nextValue(price: number): MACDOutput | undefined {
+        const result = this.generator.next(price).value;
         return result;
-    };
+    }
 }
 
-export function macd(input:MACDInput):MACDOutput[] {
+export function macd(input: MACDInput): MACDOutput[] {
        Indicator.reverseInputs(input);
-        var result = new MACD(input).result;
-        if(input.reversedInput) {
+       const result = new MACD(input).result;
+       if (input.reversedInput) {
             result.reverse();
         }
-        Indicator.reverseInputs(input);
-        return result;
-    };
+       Indicator.reverseInputs(input);
+       return result;
+    }

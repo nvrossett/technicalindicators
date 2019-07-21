@@ -54,7 +54,7 @@ describe('ForceIndex (Force Index', function () {
           close : inputForceIndex.close[index],
           volume : inputForceIndex.volume[index]
       });
-      if (result != undefined) {
+      if (result !== undefined) {
         results.push(result)
       }
     });

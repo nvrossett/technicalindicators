@@ -1,64 +1,67 @@
-import { IndicatorInput, Indicator } from '../indicator/indicator';
+import { Indicator, IndicatorInput } from "../indicator/indicator";
 /**
  * Created by AAravindan on 5/10/16.
  */
-"use strict"
+"use strict";
 
-import LinkedList from '../Utils/FixedSizeLinkedList';
-import { SMA }  from '../moving_averages/SMA';
-import { RSI } from '../oscillators/RSI';
-import { Stochastic } from '../momentum/Stochastic';
+import { Stochastic } from "../momentum/Stochastic";
+import { SMA }  from "../moving_averages/SMA";
+import { RSI } from "../oscillators/RSI";
+import LinkedList from "../Utils/FixedSizeLinkedList";
 
-export class StochasticRsiInput extends IndicatorInput{
-  values : number[];
-  rsiPeriod:number;
-  stochasticPeriod:number;
-  kPeriod:number;
-  dPeriod:number;
-};
+export class StochasticRsiInput extends IndicatorInput {
+  public values: number[];
+  public rsiPeriod: number;
+  public stochasticPeriod: number;
+  public kPeriod: number;
+  public dPeriod: number;
+}
 
-export class StochasticRSIOutput{
-  stochRSI : number
-  k:number;
-  d:number;
-};
+export class StochasticRSIOutput {
+  public stochRSI: number;
+  public k: number;
+  public d: number;
+}
 
 export class StochasticRSI extends Indicator {
-  result:StochasticRSIOutput[]
-  generator:IterableIterator<StochasticRSIOutput | undefined>;
-  constructor (input:StochasticRsiInput) {
+
+  public static calculate = stochasticrsi;
+  public result: StochasticRSIOutput[];
+  public generator: IterableIterator<StochasticRSIOutput | undefined>;
+  constructor(input: StochasticRsiInput) {
     super(input);
-    let closes = input.values;
-    let rsiPeriod = input.rsiPeriod;
-    let stochasticPeriod = input.stochasticPeriod;
-    let kPeriod = input.kPeriod;
-    let dPeriod = input.dPeriod;
-    let format = this.format;
+    const closes = input.values;
+    const rsiPeriod = input.rsiPeriod;
+    const stochasticPeriod = input.stochasticPeriod;
+    const kPeriod = input.kPeriod;
+    const dPeriod = input.dPeriod;
+    const format = this.format;
     this.result = [];
-    this.generator = (function* (){
-      let index = 1;
-      let rsi = new RSI({ period : rsiPeriod, values : []});
-      let stochastic = new Stochastic({ period : stochasticPeriod, high : [], low: [], close: [], signalPeriod : kPeriod});
-      let dSma = new SMA({
+    this.generator = (function*() {
+      const index = 1;
+      const rsi = new RSI({ period : rsiPeriod, values : []});
+      const stochastic = new Stochastic({ period : stochasticPeriod, high : [], low: [], close: [], signalPeriod : kPeriod});
+      const dSma = new SMA({
         period : dPeriod,
         values : [],
-        format : (v) => {return v}
+        format : (v) =>v,
       });
       let lastRSI, stochasticRSI, d, result;
-      var tick = yield;
+      let tick = yield;
       while (true) {
         lastRSI = rsi.nextValue(tick);
-        if(lastRSI !== undefined) {
-          var stochasticInput  = { high : lastRSI, low : lastRSI, close: lastRSI } as any;
+        if (lastRSI !== undefined) {
+          const stochasticInput  = { high : lastRSI, low : lastRSI, close: lastRSI } as any;
           stochasticRSI = stochastic.nextValue(stochasticInput);
-          if(stochasticRSI !== undefined && stochasticRSI.d !== undefined) {
+          if (stochasticRSI !== undefined && stochasticRSI.d !== undefined) {
             d = dSma.nextValue(stochasticRSI.d);
-            if(d !== undefined)
+            if (d !== undefined) {
               result =  {
                 stochRSI : stochasticRSI.k,
                 k: stochasticRSI.d,
-                d : d
-              }
+                d,
+              };
+            }
           }
         }
         tick = yield result;
@@ -68,28 +71,27 @@ export class StochasticRSI extends Indicator {
     this.generator.next();
 
     closes.forEach((tick, index) => {
-      var result = this.generator.next(tick);
-      if(result.value !== undefined){
+      const result = this.generator.next(tick);
+      if (result.value !== undefined) {
         this.result.push(result.value);
       }
     });
-  };
+  }
 
-  static calculate = stochasticrsi
-
-  nextValue (input:StochasticRsiInput):StochasticRSIOutput {
-    let nextResult = this.generator.next(input);
-    if(nextResult.value !== undefined)
+  public nextValue(input: StochasticRsiInput): StochasticRSIOutput {
+    const nextResult = this.generator.next(input);
+    if (nextResult.value !== undefined) {
       return nextResult.value;
-  };
+    }
+  }
 }
 
-export function stochasticrsi(input:StochasticRsiInput):StochasticRSIOutput[] {
+export function stochasticrsi(input: StochasticRsiInput): StochasticRSIOutput[] {
     Indicator.reverseInputs(input);
-    var result = new StochasticRSI(input).result;
-    if(input.reversedInput) {
+    const result = new StochasticRSI(input).result;
+    if (input.reversedInput) {
         result.reverse();
     }
     Indicator.reverseInputs(input);
     return result;
-};
+}

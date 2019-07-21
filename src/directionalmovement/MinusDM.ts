@@ -1,35 +1,45 @@
-import { Indicator, IndicatorInput } from '../indicator/indicator';
+import { Indicator, IndicatorInput } from "../indicator/indicator";
 /**
  * Created by AAravindan on 5/8/16.
  */
-"use strict"
+"use strict";
 
 export class MDMInput extends IndicatorInput {
-  low:number[]
-  high:number[]
-};
+  public low: number[];
+  public high: number[];
+}
 
 export class MDM extends Indicator {
-  result : number[];
-  generator:IterableIterator<number | undefined>;
-  constructor(input:MDMInput) {
-    super(input);
-    var lows = input.low
-    var highs = input.high;
-    var format = this.format;
 
-    if(lows.length != highs.length) {
-      throw ('Inputs(low,high) not of equal size');
+  public static calculate(input: MDMInput): number[] {
+       Indicator.reverseInputs(input);
+       const result = new MDM(input).result;
+       if (input.reversedInput) {
+            result.reverse();
+        }
+       Indicator.reverseInputs(input);
+       return result;
+    }
+  public result: number[];
+  public generator: IterableIterator<number | undefined>;
+  constructor(input: MDMInput) {
+    super(input);
+    const lows = input.low;
+    const highs = input.high;
+    const format = this.format;
+
+    if (lows.length !== highs.length) {
+      throw new Error(("Inputs(low,high) not of equal size"));
     }
     this.result = [];
-    this.generator = (function* (){
-      var minusDm;
-      var current = yield;
-      var last;
+    this.generator = (function*() {
+      let minusDm;
+      let current = yield;
+      let last;
       while (true) {
-        if(last){
-          let upMove = (current.high  - last.high)
-          let downMove = (last.low - current.low)
+        if (last) {
+          const upMove = (current.high  - last.high);
+          const downMove = (last.low - current.low);
           minusDm = format((downMove > upMove && downMove > 0) ? downMove : 0);
         }
         last = current;
@@ -40,26 +50,17 @@ export class MDM extends Indicator {
     this.generator.next();
 
     lows.forEach((tick, index) => {
-      var result = this.generator.next({
+      const result = this.generator.next({
         high : highs[index],
-        low  : lows[index]
+        low  : lows[index],
       });
-      if(result.value !== undefined)
+      if (result.value !== undefined) {
         this.result.push(result.value);
+      }
     });
-  };
+  }
 
-  static calculate(input:MDMInput):number[] {
-       Indicator.reverseInputs(input);
-        var result = new MDM(input).result;
-        if(input.reversedInput) {
-            result.reverse();
-        }
-        Indicator.reverseInputs(input);
-        return result;
-    };
-
-    nextValue(price:number):number | undefined {
+  public nextValue(price: number): number | undefined {
         return this.generator.next(price).value;
-    };
+    }
 }

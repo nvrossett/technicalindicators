@@ -1,24 +1,24 @@
 export default class StockData {
-    reversedInput?:boolean
-    constructor(public open:number[], public high:number[], public low:number[], public close:number[], reversedInput:boolean) {
+    public reversedInput?: boolean;
+    constructor(public open: number[], public high: number[], public low: number[], public close: number[], reversedInput: boolean) {
         this.reversedInput = reversedInput;
     }
 }
 
 export class CandleData {
-    open?:number;
-    high?:number;
-    low?:number;
-    close?:number
-    timestamp?:number
-    volume?:number
+    public open?: number;
+    public high?: number;
+    public low?: number;
+    public close?: number;
+    public timestamp?: number;
+    public volume?: number;
 }
 
 export class CandleList {
-    open?:number[] = [];
-    high?:number[] = [];
-    low?:number[] = [];
-    close?:number[] = []
-    volume?: number[] = []
-    timestamp? : number[] = []
+    public open?: number[] = [];
+    public high?: number[] = [];
+    public low?: number[] = [];
+    public close?: number[] = [];
+    public volume?: number[] = [];
+    public timestamp?: number[] = [];
 }

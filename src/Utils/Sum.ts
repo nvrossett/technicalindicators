@@ -1,65 +1,63 @@
 
-import { Indicator, IndicatorInput } from '../indicator/indicator';
-import FixedSizedLinkedList from './FixedSizeLinkedList';
-import { CandleData } from '../StockData';
+import { Indicator, IndicatorInput } from "../indicator/indicator";
+import { CandleData } from "../StockData";
+import FixedSizedLinkedList from "./FixedSizeLinkedList";
 
 export class SumInput extends IndicatorInput {
-  values :number[]
-  period :number
+  public values: number[];
+  public period: number;
 }
 
 export class Sum extends Indicator {
-  generator:IterableIterator<number | undefined>;
-    constructor (input:SumInput) {
+
+  public static calculate = sum;
+  public generator: IterableIterator<number | undefined>;
+  constructor(input: SumInput) {
       super(input);
-      var values     = input.values;
-      var period     = input.period;
+      const values     = input.values;
+      const period     = input.period;
 
       this.result = [];
 
-      var periodList = new FixedSizedLinkedList(period, false, false, true);
+      const periodList = new FixedSizedLinkedList(period, false, false, true);
 
-      this.generator = (function* (){
-        var result;
-        var tick;
-        var high;
+      this.generator = (function*() {
+        let tick;
+        let high;
         tick = yield;
-        while (true)
-        {
+        while (true) {
           periodList.push(tick);
-          if(periodList.totalPushed >= period) {
+          if (periodList.totalPushed >= period) {
             high = periodList.periodSum;
           }
-          tick = yield high
+          tick = yield high;
         }
       })();
 
       this.generator.next();
 
       values.forEach((value, index) => {
-        var result = this.generator.next(value);
-        if(result.value != undefined) {
+        const result = this.generator.next(value);
+        if (result.value !== undefined) {
           this.result.push(result.value);
         }
       });
-  };
+  }
 
-  static calculate = sum;
-
-  nextValue(price:number):number | undefined {
-     var result =  this.generator.next(price);
-     if(result.value != undefined){
+  public nextValue(price: number): number | undefined {
+     const result =  this.generator.next(price);
+     if (result.value !== undefined) {
         return result.value;
       }
-  };
+  }
 }
 
-export function sum(input:SumInput):number[] {
+export function sum(input: SumInput): number[] {
       Indicator.reverseInputs(input);
-      var result = new Sum(input).result;
-      if(input.reversedInput) {
+      const result = new Sum(input).result;
+      if (input.reversedInput) {
           result.reverse();
       }
       Indicator.reverseInputs(input);
       return result;
-  };
+  }

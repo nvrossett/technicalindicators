@@ -1,5 +1,5 @@
-import StockData from '../StockData';
-import CandlestickFinder from './CandlestickFinder';
+import StockData from "../StockData";
+import CandlestickFinder from "./CandlestickFinder";
 
 export default class BullishHarami extends CandlestickFinder {
     constructor() {
@@ -7,27 +7,27 @@ export default class BullishHarami extends CandlestickFinder {
         this.requiredCount  = 2;
         this.name =  "BullishHarami";
     }
-    logic (data:StockData) {
-        let firstdaysOpen   = data.open[0];
-        let firstdaysClose  = data.close[0];
-        let firstdaysHigh   = data.high[0];
-        let firstdaysLow    = data.low[0]
-        let seconddaysOpen  = data.open[1];
-        let seconddaysClose = data.close[1];
-        let seconddaysHigh  = data.high[1];
-        let seconddaysLow   = data.low[1]
-        
-		let isBullishHaramiPattern = ((firstdaysOpen > seconddaysOpen) && 
-		(firstdaysClose < seconddaysOpen)&&
-		(firstdaysClose < seconddaysClose)&& 
-		(firstdaysOpen  > seconddaysLow)&&
-                               (firstdaysHigh  > seconddaysHigh));           
-   
+    public logic(data: StockData) {
+        const firstdaysOpen   = data.open[0];
+        const firstdaysClose  = data.close[0];
+        const firstdaysHigh   = data.high[0];
+        const firstdaysLow    = data.low[0];
+        const seconddaysOpen  = data.open[1];
+        const seconddaysClose = data.close[1];
+        const seconddaysHigh  = data.high[1];
+        const seconddaysLow   = data.low[1];
+
+		      const isBullishHaramiPattern = ((firstdaysOpen > seconddaysOpen) &&
+		(firstdaysClose < seconddaysOpen) &&
+		(firstdaysClose < seconddaysClose) &&
+		(firstdaysOpen  > seconddaysLow) &&
+                               (firstdaysHigh  > seconddaysHigh));
+
         return (isBullishHaramiPattern);
-        
+
    }
 }
 
-export function bullishharami(data:StockData) {
+export function bullishharami(data: StockData) {
   return new BullishHarami().hasPattern(data);
 }

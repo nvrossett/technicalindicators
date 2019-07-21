@@ -1,6 +1,4 @@
-import { IndicatorInput, Indicator } from '../indicator/indicator';
-
-"use strict"
+import { Indicator, IndicatorInput } from "../indicator/indicator";
 
 /*
   There seems to be a few interpretations of the rules for this regarding which prices.
@@ -33,29 +31,31 @@ import { IndicatorInput, Indicator } from '../indicator/indicator';
   If the SAR is calculated to be BELOW the previous day's HIGH or today's HIGH then use the higher high between today and the previous day as the new SAR. Make the next day's calculations based on this SAR.
   ----------------------------------------------------------------------------------------
 */
-export class PSARInput extends IndicatorInput{
-  step:number;
-  max:number;
-  high:number[];
-  low:number[];
-};
+export class PSARInput extends IndicatorInput {
+  public step: number;
+  public max: number;
+  public high: number[];
+  public low: number[];
+}
 
 export class PSAR extends Indicator {
-  result:number[];
-  generator:IterableIterator<number | undefined>;
-  constructor (input:PSARInput) {
+
+  public static calculate = psar;
+  public result: number[];
+  public generator: IterableIterator<number | undefined>;
+  constructor(input: PSARInput) {
     super(input);
 
-    let highs = input.high || [];
-    let lows = input.low || [];
+    const highs = input.high || [];
+    const lows = input.low || [];
 
-    var genFn = function* (step:number, max:number):IterableIterator<number | undefined> {
+    const genFn = function*(step: number, max: number): IterableIterator<number | undefined> {
       let curr, extreme, sar, furthest;
 
       let up = true;
       let accel = step;
       let prev = yield;
-      while(true) {
+      while (true) {
         if (curr) {
           sar = sar + accel * (extreme - sar);
 
@@ -65,7 +65,7 @@ export class PSAR extends Indicator {
             if (curr.high > extreme) {
               extreme = curr.high;
               accel = Math.min(accel + step, max);
-            };
+            }
           } else {
             sar = Math.max(sar, furthest.high, prev.high);
 
@@ -88,7 +88,9 @@ export class PSAR extends Indicator {
         }
 
         furthest = prev;
-        if (curr) prev = curr;
+        if (curr) {
+          prev = curr;
+        }
         curr = yield sar;
       }
     };
@@ -98,31 +100,30 @@ export class PSAR extends Indicator {
     this.generator.next();
 
     lows.forEach((tick, index) => {
-      var result = this.generator.next({
+      const result = this.generator.next({
         high: highs[index],
         low: lows[index],
       });
-      if(result.value !== undefined){
+      if (result.value !== undefined) {
         this.result.push(result.value);
       }
     });
-  };
+  }
 
-  static calculate = psar;
-
-  nextValue (input:PSARInput):number {
-    let nextResult = this.generator.next(input);
-    if(nextResult.value !== undefined)
+  public nextValue(input: PSARInput): number {
+    const nextResult = this.generator.next(input);
+    if (nextResult.value !== undefined) {
       return nextResult.value;
-  };
+    }
+  }
 }
 
-export function psar(input:PSARInput):number[] {
+export function psar(input: PSARInput): number[] {
         Indicator.reverseInputs(input);
-        var result = new PSAR(input).result;
-        if(input.reversedInput) {
+        const result = new PSAR(input).result;
+        if (input.reversedInput) {
             result.reverse();
         }
         Indicator.reverseInputs(input);
         return result;
-    };
+    }

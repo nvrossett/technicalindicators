@@ -63,7 +63,7 @@ describe('CCI (Commodity Channel Index', function () {
           low : inputCCI.low[index],
           close : inputCCI.close[index]
       });
-      if (result != undefined) {
+      if (result !== undefined) {
         results.push(result)
       }
     });

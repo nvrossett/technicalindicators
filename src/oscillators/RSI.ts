@@ -2,38 +2,40 @@
  * Created by AAravindan on 5/5/16.
  */
 
-import { Indicator, IndicatorInput } from '../indicator/indicator';
-import { AverageGain } from '../Utils/AverageGain';
-import { AverageLoss } from '../Utils/AverageLoss';
+import { Indicator, IndicatorInput } from "../indicator/indicator";
+import { AverageGain } from "../Utils/AverageGain";
+import { AverageLoss } from "../Utils/AverageLoss";
 
 export class RSIInput extends IndicatorInput {
-  period: number;
-  values: number[];
+  public period: number;
+  public values: number[];
 }
 
 export class RSI extends Indicator {
 
-  generator:IterableIterator<number | undefined>;
+  public static calculate = rsi;
 
-  constructor(input:RSIInput) {
+  public generator: IterableIterator<number | undefined>;
+
+  constructor(input: RSIInput) {
     super(input);
 
-    var period = input.period;
-    var values = input.values;
+    const period = input.period;
+    const values = input.values;
 
-    var GainProvider = new AverageGain({ period: period, values: [] });
-    var LossProvider = new AverageLoss({ period: period, values: [] });
+    const GainProvider = new AverageGain({ period, values: [] });
+    const LossProvider = new AverageLoss({ period, values: [] });
     let count = 1;
-    this.generator = (function* (period){
-      var current = yield;
-      var lastAvgGain,lastAvgLoss, RS, currentRSI;
-      while(true){
+    this.generator = (function*(period) {
+      let current = yield;
+      let lastAvgGain, lastAvgLoss, RS, currentRSI;
+      while (true) {
         lastAvgGain = GainProvider.nextValue(current);
         lastAvgLoss = LossProvider.nextValue(current);
-        if((lastAvgGain!==undefined) && (lastAvgLoss!==undefined)){
-          if(lastAvgLoss === 0){
+        if ((lastAvgGain !== undefined) && (lastAvgLoss !== undefined)) {
+          if (lastAvgLoss === 0) {
             currentRSI = 100;
-          } else if(lastAvgGain === 0 ) { 
+          } else if (lastAvgGain === 0) {
             currentRSI = 0;
           } else {
             RS = lastAvgGain / lastAvgLoss;
@@ -51,26 +53,24 @@ export class RSI extends Indicator {
     this.result = [];
 
     values.forEach((tick) => {
-      var result = this.generator.next(tick);
-      if(result.value !== undefined){
+      const result = this.generator.next(tick);
+      if (result.value !== undefined) {
         this.result.push(result.value);
       }
     });
-  };
+  }
 
-  static calculate = rsi;
-
-    nextValue(price:number):number | undefined {
+  public nextValue(price: number): number | undefined {
         return this.generator.next(price).value;
-    };
+    }
 }
 
-export function rsi(input:RSIInput):number[] {
+export function rsi(input: RSIInput): number[] {
        Indicator.reverseInputs(input);
-        var result = new RSI(input).result;
-        if(input.reversedInput) {
+       const result = new RSI(input).result;
+       if (input.reversedInput) {
             result.reverse();
         }
-        Indicator.reverseInputs(input);
-        return result;
-    };
+       Indicator.reverseInputs(input);
+       return result;
+    }

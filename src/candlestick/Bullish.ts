@@ -1,21 +1,21 @@
-import MorningStar from './MorningStar';
-import BullishEngulfingPattern from './BullishEngulfingPattern';
-import BullishHarami from './BullishHarami';
-import BullishHaramiCross from './BullishHaramiCross';
-import MorningDojiStar from './MorningDojiStar';
-import DownsideTasukiGap from './DownsideTasukiGap';
-import BullishMarubozu from './BullishMarubozu';
-import PiercingLine from './PiercingLine';
-import ThreeWhiteSoldiers from './ThreeWhiteSoldiers';
-import BullishHammerStick from './BullishHammerStick';
-import BullishInvertedHammerStick from './BullishInvertedHammerStick';
-import HammerPattern from './HammerPattern';
-import HammerPatternUnconfirmed from './HammerPatternUnconfirmed';
-import StockData from '../StockData';
-import CandlestickFinder from './CandlestickFinder';
-import TweezerBottom from './TweezerBottom';
+import StockData from "../StockData";
+import BullishEngulfingPattern from "./BullishEngulfingPattern";
+import BullishHammerStick from "./BullishHammerStick";
+import BullishHarami from "./BullishHarami";
+import BullishHaramiCross from "./BullishHaramiCross";
+import BullishInvertedHammerStick from "./BullishInvertedHammerStick";
+import BullishMarubozu from "./BullishMarubozu";
+import CandlestickFinder from "./CandlestickFinder";
+import DownsideTasukiGap from "./DownsideTasukiGap";
+import HammerPattern from "./HammerPattern";
+import HammerPatternUnconfirmed from "./HammerPatternUnconfirmed";
+import MorningDojiStar from "./MorningDojiStar";
+import MorningStar from "./MorningStar";
+import PiercingLine from "./PiercingLine";
+import ThreeWhiteSoldiers from "./ThreeWhiteSoldiers";
+import TweezerBottom from "./TweezerBottom";
 
-let bullishPatterns = [
+const bullishPatterns = [
     new BullishEngulfingPattern(),
     new DownsideTasukiGap(),
     new BullishHarami(),
@@ -29,23 +29,23 @@ let bullishPatterns = [
     new BullishInvertedHammerStick(),
     new HammerPattern(),
     new HammerPatternUnconfirmed(),
-    new TweezerBottom()
+    new TweezerBottom(),
 ];
 
 export default class BullishPatterns extends CandlestickFinder {
     constructor() {
         super();
-        this.name = 'Bullish Candlesticks';
+        this.name = "Bullish Candlesticks";
     }
 
-    hasPattern (data:StockData) {
+    public hasPattern(data: StockData) {
         return bullishPatterns.reduce(function(state, pattern) {
-            let result = pattern.hasPattern(data);
+            const result = pattern.hasPattern(data);
             return state || result;
-        }, false)
+        }, false);
     }
 }
 
-export function bullish(data:StockData) {
+export function bullish(data: StockData) {
   return new BullishPatterns().hasPattern(data);
 }

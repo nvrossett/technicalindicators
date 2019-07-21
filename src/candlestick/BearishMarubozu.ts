@@ -1,28 +1,28 @@
-import StockData from '../StockData';
-import CandlestickFinder from './CandlestickFinder';
+import StockData from "../StockData";
+import CandlestickFinder from "./CandlestickFinder";
 
 export default class BearishMarubozu extends CandlestickFinder {
     constructor() {
         super();
-        this.name = 'BearishMarubozu';
+        this.name = "BearishMarubozu";
         this.requiredCount  = 1;
     }
-    logic (data:StockData) {
-        let daysOpen  = data.open[0];
-        let daysClose = data.close[0];
-        let daysHigh  = data.high[0];
-        let daysLow   = data.low[0];
+    public logic(data: StockData) {
+        const daysOpen  = data.open[0];
+        const daysClose = data.close[0];
+        const daysHigh  = data.high[0];
+        const daysLow   = data.low[0];
 
-        let isBearishMarbozu =  this.approximateEqual(daysOpen, daysHigh) && 
+        const isBearishMarbozu =  this.approximateEqual(daysOpen, daysHigh) &&
                                 this.approximateEqual(daysLow, daysClose) &&
-                                daysOpen > daysClose && 
+                                daysOpen > daysClose &&
                                 daysOpen > daysLow;
 
         return (isBearishMarbozu);
-        
+
     }
 }
 
-export function bearishmarubozu(data:StockData) {
+export function bearishmarubozu(data: StockData) {
   return new BearishMarubozu().hasPattern(data);
 }

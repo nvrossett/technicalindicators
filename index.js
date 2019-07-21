@@ -1,6 +1,6 @@
 export * from './lib/index.js';
 export function getAvailableIndicators () {
-  let AvailableIndicators   = []
+  let AvailableIndicators   = [];
   AvailableIndicators.push('sma');
   AvailableIndicators.push('ema');
   AvailableIndicators.push('wma');
@@ -76,7 +76,7 @@ export function getAvailableIndicators () {
   AvailableIndicators.push('tweezertop');
   AvailableIndicators.push('tweezerbottom');
 
-  AvailableIndicators.push('predictPattern');
+  // AvailableIndicators.push('predictPattern');
   AvailableIndicators.push('hasDoubleBottom');
   AvailableIndicators.push('hasDoubleTop');
   AvailableIndicators.push('hasHeadAndShoulder');
@@ -84,11 +84,11 @@ export function getAvailableIndicators () {
   AvailableIndicators.push('isTrendingUp');
   AvailableIndicators.push('isTrendingDown');
   AvailableIndicators.push('ichimokucloud');
-  
+
   AvailableIndicators.push('keltnerchannels');
   AvailableIndicators.push('chandelierexit');
   return AvailableIndicators;
-};
+}
 
 let AvailableIndicators = getAvailableIndicators();
 export { AvailableIndicators }

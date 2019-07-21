@@ -1,17 +1,17 @@
-import StockData from '../StockData';
-import CandlestickFinder from './CandlestickFinder';
+import StockData from "../StockData";
+import CandlestickFinder from "./CandlestickFinder";
 
 export default class BullishHammerStick extends CandlestickFinder {
     constructor() {
         super();
-        this.name = 'BullishHammerStick';
+        this.name = "BullishHammerStick";
         this.requiredCount  = 1;
     }
-    logic (data:StockData) {
-        let daysOpen  = data.open[0];
-        let daysClose = data.close[0];
-        let daysHigh  = data.high[0];
-        let daysLow   = data.low[0];
+    public logic(data: StockData) {
+        const daysOpen  = data.open[0];
+        const daysClose = data.close[0];
+        const daysHigh  = data.high[0];
+        const daysLow   = data.low[0];
 
         let isBullishHammer = daysClose > daysOpen;
         isBullishHammer = isBullishHammer && this.approximateEqual(daysClose, daysHigh);
@@ -21,6 +21,6 @@ export default class BullishHammerStick extends CandlestickFinder {
     }
 }
 
-export function bullishhammerstick(data:StockData) {
+export function bullishhammerstick(data: StockData) {
   return new BullishHammerStick().hasPattern(data);
 }

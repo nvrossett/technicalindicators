@@ -1,32 +1,33 @@
-import { EMA } from '../moving_averages/EMA';
-import { CandleData } from '../StockData';
-import { Indicator, IndicatorInput } from '../indicator/indicator';
+import { Indicator, IndicatorInput } from "../indicator/indicator";
+import { EMA } from "../moving_averages/EMA";
+import { CandleData } from "../StockData";
 
 export class ForceIndexInput extends IndicatorInput {
-  close : number[];
-  volume : number[];
-  period : number = 1;
-};
-
+  public close: number[];
+  public volume: number[];
+  public period: number = 1;
+}
 
 export class ForceIndex extends Indicator {
-  result : number[]
-  generator:IterableIterator<number | undefined>;;
-  constructor(input:ForceIndexInput) {
+
+  public static calculate = forceindex;
+  public result: number[];
+  public generator: IterableIterator<number | undefined>;
+  constructor(input: ForceIndexInput) {
     super(input);
-    var closes = input.close;
-    var volumes = input.volume;
-    var period = input.period || 1
-    
-    if(!((volumes.length === closes.length))){
-      throw ('Inputs(volume, close) not of equal size');
+    const closes = input.close;
+    const volumes = input.volume;
+    const period = input.period || 1;
+
+    if (!((volumes.length === closes.length))) {
+      throw new Error(("Inputs(volume, close) not of equal size"));
     }
-    let emaForceIndex = new EMA({ values : [], period: period })
+    const emaForceIndex = new EMA({ values : [], period });
     this.result = [];
 
-    this.generator = (function* (){
-      var previousTick = yield;
-      var tick = yield;
+    this.generator = (function*() {
+      let previousTick = yield;
+      let tick = yield;
       let forceIndex;
       while (true) {
         forceIndex = (tick.close - previousTick.close) * tick.volume;
@@ -37,33 +38,31 @@ export class ForceIndex extends Indicator {
 
     this.generator.next();
 
-    volumes.forEach((tick,index) => {
-      var result = this.generator.next({
+    volumes.forEach((tick, index) => {
+      const result = this.generator.next({
         close : closes[index],
-        volume : volumes[index]
+        volume : volumes[index],
       });
-      if(result.value != undefined){
+      if (result.value !== undefined) {
         this.result.push(result.value);
       }
     });
-  };
+  }
 
-  static calculate = forceindex;
-
-  nextValue(price: CandleData):number | undefined {
-      let result = this.generator.next(price).value;
-      if(result != undefined) {
+  public nextValue(price: CandleData): number | undefined {
+      const result = this.generator.next(price).value;
+      if (result !== undefined) {
         return result;
       }
-  };
+  }
 }
 
-export function forceindex(input:ForceIndexInput):number[] {
+export function forceindex(input: ForceIndexInput): number[] {
     Indicator.reverseInputs(input);
-    var result = new ForceIndex(input).result;
-    if(input.reversedInput) {
+    const result = new ForceIndex(input).result;
+    if (input.reversedInput) {
         result.reverse();
     }
     Indicator.reverseInputs(input);
     return result;
-  };
+  }
