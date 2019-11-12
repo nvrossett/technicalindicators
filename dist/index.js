@@ -1857,7 +1857,7 @@ class CCI extends Indicator {
                     }
                     // Fourth, divide by the total number of periods (20).
                     meanDeviation = sum / period;
-                    cci = (tp - smaTp) / (constant * meanDeviation);
+                    cci = (tp - smaTp) / (constant * meanDeviation) 
                 }
                 tick = yield cci;
             }
